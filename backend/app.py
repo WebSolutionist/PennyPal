@@ -7,8 +7,9 @@ from flask_cors import CORS
 from dotenv import load_dotenv
 from supabase import create_client, Client
 
-# Load environment variables
-load_dotenv()
+# Load environment variables relative to the script location
+basedir = os.path.abspath(os.path.dirname(__file__))
+load_dotenv(os.path.join(basedir, '.env'))
 
 app = Flask(__name__)
 CORS(app)
@@ -588,4 +589,4 @@ def chat():
         return jsonify({"error": f"Failed to get response from Qwen: {str(e)}"}), 500
 
 if __name__ == "__main__":
-    app.run(port=PORT, debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=True)
