@@ -103,19 +103,33 @@ def save_memory_direct(memory_data):
         local_mems.append(memory_data)
     save_local_memories(local_mems)
 
-def archive_all_related_memories(session_id, keyword):
+def get_clean_keywords(text):
+    text = text.lower()
+    # Remove common filler words
+    filler_words = {"wants", "to", "save", "for", "a", "an", "the", "buying", "buy", "saving", "project", "successfully", "bought"}
+    words = re.findall(r'\b\w+\b', text)
+    keywords = [w for w in words if w not in filler_words and len(w) > 2]
+    return keywords
+
+def archive_all_related_memories(session_id, keyword_text):
     """
     Find and archive (is_active = False) all active memories 
-    containing a specific keyword (e.g. 'laptop') when a goal is completed.
+    containing any core keywords from the completed goal or action.
     """
     active_mems = get_memories(session_id, include_inactive=False)
-    keyword_lower = keyword.lower()
+    keywords = get_clean_keywords(keyword_text)
     
+    if not keywords:
+        return
+        
     for m in active_mems:
-        # Check if the content contains the keyword (e.g., 'laptop')
-        if re.search(r'\b' + re.escape(keyword_lower) + r'\b', m["content"].lower()):
-            m["is_active"] = False
-            save_memory_direct(m)
+        m_content_lower = m["content"].lower()
+        # Check if any clean keyword exists in the memory content
+        for kw in keywords:
+            if re.search(r'\b' + re.escape(kw) + r'\b', m_content_lower):
+                m["is_active"] = False
+                save_memory_direct(m)
+                break
 
 def apply_decay(session_id, current_active_session):
     """
@@ -199,11 +213,15 @@ def process_memory_updates(session_id, extractions):
             save_memory_direct(new_mem)
 
         elif action == "achieve" and matched_mem:
-            # 1. Archive the old goal/saving memory AND all related active memories for that keyword
-            item_keyword = content.strip().lower()
-            archive_all_related_memories(session_id, item_keyword)
+            # 1. Archive the target goal memory directly to guarantee it is disabled
+            matched_mem["is_active"] = False
+            save_memory_direct(matched_mem)
             
-            # 2. Add the milestone achievement as a permanent fact (marked is_active: True so it shows on the sidebar)
+            # 2. Archive all other related memories using keywords from the goal or new content
+            combined_text = f"{matched_mem['content']} {content}"
+            archive_all_related_memories(session_id, combined_text)
+            
+            # 3. Add the milestone achievement as a permanent fact (marked is_active: True so it shows on the sidebar)
             new_mem = {
                 "session_id": session_id,
                 "category": "Constraints & Facts",
@@ -254,8 +272,8 @@ User Message: "{message}"
 Determine which action is happening:
 - "new": The user shares something not in the existing memories.
 - "update": The user reinforces or repeats an existing memory.
-- "contradict": The user changes a previous active memory (e.g., changing a goal amount, changing rent cost, or changing a habit).
-- "achieve": The user states they have successfully completed or bought a previously tracked goal (e.g. "I bought the laptop"). Clean up the content to just represent the item name (e.g., "laptop").
+- "contradict": The user changes a previous active memory (e.g., changing a goal amount, changing rent cost, changing a habit), OR expresses an emotional state/feeling that directly contradicts a previously stored active feeling (e.g. saying they are feeling excited/confident/calm contradicts a stored memory of feeling stressed/anxious/uneasy about saving). When contradict is triggered, "target_memory_content" MUST match the exact text of the conflicting memory to override it (e.g. target "Feels uneasy and stressed about saving because they have never saved before" to replace it with a new content like "Feels excited and confident about savings").
+- "achieve": The user states they have successfully completed or bought a previously tracked goal (e.g. "I bought the laptop"). Clean up the content to just represent the item name (e.g., "laptop" or "phone and headset").
 - "delete": The user explicitly asks to forget something, cancel a goal, drop a priority, or states a previous goal is no longer true (e.g., "forget the phone goal", "the phone is no longer a priority", "I don't want to save for a phone anymore", "cancel my saving plans for the phone"). When delete is triggered, "target_memory_content" MUST match the exact text of the existing memory to delete (e.g. "Wants to save $300 for a phone").
 
 Respond ONLY with a valid JSON array of objects. Do not include markdown formatting other than the JSON itself. If nothing is worth remembering or changing, return an empty array [].
