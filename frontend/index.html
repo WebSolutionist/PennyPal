@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PennyPal — Your AI Financial Coach</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <!-- Lucide Icons CDN -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar / Memory Dashboard -->
+        <aside class="sidebar" id="sidebar">
+            <div class="brand">
+                <img src="assets/logo.png" alt="PennyPal Logo" class="brand-logo-img">
+                <div class="brand-info">
+                    <h1>PennyPal</h1>
+                    <span>AI Financial Coach</span>
+                </div>
+            </div>
+
+            <!-- Demo Mode Toggle -->
+            <div class="demo-toggle-container">
+                <div class="toggle-header">
+                    <span class="flex-align"><i data-lucide="brain" class="icon-blue"></i> Memory Engine</span>
+                    <label class="switch">
+                        <input type="checkbox" id="memory-toggle" checked>
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+                <p class="toggle-desc">Toggle memory to compare responses for the hackathon demo.</p>
+            </div>
+
+            <!-- Session Manager -->
+            <div class="session-container">
+                <h2 class="flex-align"><i data-lucide="message-square"></i> Chat Sessions</h2>
+                <div class="session-desc">Simulate separate conversations over time.</div>
+                <div class="session-list" id="session-list">
+                    <!-- Dynamic sessions go here -->
+                </div>
+                <button id="new-session-btn" class="btn btn-secondary flex-align justify-center">
+                    <i data-lucide="plus"></i> Start New Session
+                </button>
+            </div>
+
+            <!-- Memory Monitor Panel -->
+            <div class="memory-panel">
+                <div class="memory-panel-header">
+                    <h2 class="flex-align"><i data-lucide="database" class="icon-green"></i> Persistent Memory</h2>
+                    <span class="memory-count" id="memory-count">0 memories</span>
+                </div>
+                <p class="panel-desc">What PennyPal currently knows about you across all sessions:</p>
+                <div class="memory-list" id="memory-list">
+                    <div class="empty-memory">No memories saved yet. Start talking to PennyPal!</div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Chat Area -->
+        <main class="chat-area">
+            <header class="chat-header">
+                <div class="header-left">
+                    <!-- Sidebar Toggle Button -->
+                    <button id="sidebar-toggle" class="sidebar-toggle-btn" aria-label="Toggle Sidebar">
+                        <i data-lucide="menu"></i>
+                    </button>
+                    <div class="chat-title-info">
+                        <h2 id="current-session-title">Session 1</h2>
+                        <p id="chat-status-text">Ready to chat</p>
+                    </div>
+                </div>
+                <div class="api-status">
+                    <span class="status-dot" id="status-dot"></span>
+                    <span id="status-text">Checking connection...</span>
+                </div>
+            </header>
+
+            <div class="chat-messages" id="chat-messages">
+                <div class="message system">
+                    <div class="message-avatar">
+                        <img src="assets/logo.png" alt="PennyPal Avatar" class="avatar-img">
+                    </div>
+                    <div class="message-content">
+                        <p>Hello! I'm <strong>PennyPal</strong>, your personal AI financial coach. Let's talk about your money goals, budgets, or any financial questions you have today!</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="chat-input-container">
+                <form id="chat-form">
+                    <input type="text" id="chat-input" placeholder="Ask about budgeting, saving, or your financial goals..." autocomplete="off" required>
+                    <button type="submit" class="btn btn-primary" id="send-btn">
+                        <i data-lucide="send"></i>
+                    </button>
+                </form>
+            </div>
+        </main>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

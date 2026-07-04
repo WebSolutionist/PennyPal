@@ -1,0 +1,33 @@
+# Environment files
+.env
+backend/.env
+
+# Local database
+local_memories.json
+backend/local_memories.json
+
+# Python caching
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.venv/
+venv/
+ENV/
+env/
+
+# OS metadata
+.DS_Store
+Thumbs.db
+
+# Frontend dependencies and builds
+node_modules/
+dist/
+build/
+.next/
+out/
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
