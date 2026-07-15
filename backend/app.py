@@ -80,7 +80,7 @@ def save_memory_direct(memory_data):
     if supabase_client:
         try:
             if "id" in memory_data:
-                memory_data["updated_at"] = "now()"
+                memory_data["updated_at"] = now_str
                 supabase_client.table("memories").update(memory_data).eq("id", memory_data["id"]).execute()
             else:
                 supabase_client.table("memories").insert(memory_data).execute()
@@ -144,6 +144,14 @@ def apply_decay(session_id, current_active_session):
                 m["importance"] = new_importance
                 save_memory_direct(m)
 
+def get_overlap_ratio(str1, str2):
+    w1 = set(get_clean_keywords(str1))
+    w2 = set(get_clean_keywords(str2))
+    if not w1 or not w2:
+        return 0.0
+    intersection = w1.intersection(w2)
+    return len(intersection) / min(len(w1), len(w2))
+
 def process_memory_updates(session_id, extractions):
     """Process extracted memory actions: new, update, contradict, delete, achieve."""
     existing_memories = get_memories(session_id, include_inactive=True)
@@ -158,10 +166,21 @@ def process_memory_updates(session_id, extractions):
 
         matched_mem = None
         if target_memory_content:
+            # 1. Try strict matching first
             for m in existing_memories:
                 if m["content"].lower() == target_memory_content.lower() and m["category"] == category:
                     matched_mem = m
                     break
+            
+            # 2. Try robust fuzzy keyword overlap match (threshold >= 50%)
+            if not matched_mem:
+                best_score = 0.0
+                for m in existing_memories:
+                    if m["category"] == category and m["is_active"]:
+                        score = get_overlap_ratio(m["content"], target_memory_content)
+                        if score > best_score and score >= 0.5:
+                            best_score = score
+                            matched_mem = m
 
         if action == "new":
             duplicate = None
@@ -607,4 +626,4 @@ def chat():
         return jsonify({"error": f"Failed to get response from Qwen: {str(e)}"}), 500
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=True, threaded=True)
