@@ -258,7 +258,7 @@ Categories available:
 1. "Goals": Specific financial targets. Base importance: 4.
 2. "Habits & Behaviors": Repeated spending/saving patterns. Base importance: 3.
 3. "Feelings & Attitudes": Emotional states about money. Base importance: 2.
-4. "Constraints & Facts": Hard financial facts (rent, salary dates, achievements). Base importance: 3.
+4. "Constraints & Facts": Hard financial facts or core personal identity facts (e.g. rent amounts, salary dates, achievements, or the user's name). Base importance: 3.
 5. "Action Plan Commitments": Specific promises the user makes to themselves. Base importance: 4.
 
 Scoring Rules:
@@ -272,7 +272,7 @@ User Message: "{message}"
 Determine which action is happening:
 - "new": The user shares something not in the existing memories.
 - "update": The user reinforces or repeats an existing memory.
-- "contradict": The user changes a previous active memory (e.g., changing a goal amount, changing rent cost, changing a habit), OR expresses an emotional state/feeling that directly contradicts a previously stored active feeling (e.g. saying they are feeling excited/confident/calm contradicts a stored memory of feeling stressed/anxious/uneasy about saving). When contradict is triggered, "target_memory_content" MUST match the exact text of the conflicting memory to override it (e.g. target "Feels uneasy and stressed about saving because they have never saved before" to replace it with a new content like "Feels excited and confident about savings").
+- "contradict": The user explicitly changes, corrects, updates, or overrides a previous active memory across ANY category (Goal, Habit & Behavior, Feelings & Attitudes, Constraints & Facts, Action Plan Commitments). For example: changing a habit from "Used to squander money" to "No longer squanders and follows a celebratory budget"; changing a goal timeline or budget; changing a feeling from "stressed/anxious about saving" to "excited and confident"; or changing a constraint. If the user's new statement makes any stored memory obsolete, incorrect, or outdated, you MUST trigger "contradict". In this case, "target_memory_content" MUST match the exact text of the conflicting memory to archive it, and "content" should represent the new updated state.
 - "achieve": The user states they have successfully completed or bought a previously tracked goal (e.g. "I bought the laptop"). Clean up the content to just represent the item name (e.g., "laptop" or "phone and headset").
 - "delete": The user explicitly asks to forget something, cancel a goal, drop a priority, or states a previous goal is no longer true (e.g., "forget the phone goal", "the phone is no longer a priority", "I don't want to save for a phone anymore", "cancel my saving plans for the phone"). When delete is triggered, "target_memory_content" MUST match the exact text of the existing memory to delete (e.g. "Wants to save $300 for a phone").
 
